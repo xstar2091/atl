@@ -31,15 +31,104 @@ TEST(ToString, Default) {
     EXPECT_STREQ(expected, actual);
 }
 
-TEST(ToString, Format) {
+TEST(ToString, Format14) {
+    time_t current_time = time(nullptr);
+    localtime_r(&current_time, &t);
+
+    strftime(expected, sizeof(expected), "%Y%m%d%H%M%S", &t);
+    actual = ts.ToString("20000102030405");
+    EXPECT_STREQ(expected, actual);
+}
+
+TEST(ToString, Format19) {
+    time_t current_time = time(nullptr);
+    localtime_r(&current_time, &t);
+
+    strftime(expected, sizeof(expected), "%Y-%m-%d %H:%M:%S", &t);
     actual = ts.ToString("2000-01-02 03:04:05");
-    printf("%s\n", actual);
-    EXPECT_TRUE(CheckFormat(actual,
-                            std::vector<std::pair<int, char>>{ {4, '-'}, {7, '-'}, {10, ' '}, {13, ':'}, {16, ':'} }));
+    EXPECT_STREQ(expected, actual);
+
+    strftime(expected, sizeof(expected), "%Y/%m/%dT%H-%M-%S", &t);
     actual = ts.ToString("2000/01/02T03-04-05");
-    printf("%s\n", actual);
+    EXPECT_STREQ(expected, actual);
+}
+
+TEST(ToString, Format23) {
+    actual = ts.ToString("2000-01-02 03:04:05.123");
     EXPECT_TRUE(CheckFormat(actual,
-                            std::vector<std::pair<int, char>>{ {4, '/'}, {7, '/'}, {10, 'T'}, {13, '-'}, {16, '-'} }));
+                            std::vector<std::pair<int, char>>{ {4, '-'}, {7, '-'}, {10, ' '}, {13, ':'},
+                                                                           {16, ':'}, {19, '.'} })
+    );
+    actual = ts.ToString("2000/01/02T03-04-05~123");
+    EXPECT_TRUE(CheckFormat(actual,
+                            std::vector<std::pair<int, char>>{ {4, '/'}, {7, '/'}, {10, 'T'}, {13, '-'}, {16, '-'},
+                                                                           {19, '~'} })
+    );
+}
+
+TEST(ToString, Format26) {
+    actual = ts.ToString("2000-01-02 03:04:05.123456");
+    EXPECT_TRUE(CheckFormat(actual,
+                            std::vector<std::pair<int, char>>{ {4, '-'}, {7, '-'}, {10, ' '}, {13, ':'},
+                                                                           {16, ':'}, {19, '.'} })
+    );
+    actual = ts.ToString("2000/01/02T03-04-05~123456");
+    EXPECT_TRUE(CheckFormat(actual,
+                            std::vector<std::pair<int, char>>{ {4, '/'}, {7, '/'}, {10, 'T'}, {13, '-'}, {16, '-'},
+                                                                           {19, '~'} })
+    );
+}
+
+TEST(ToString, Format27) {
+    actual = ts.ToString("2000-01-02 03:04:05.123.456");
+    EXPECT_TRUE(CheckFormat(actual,
+                            std::vector<std::pair<int, char>>{ {4, '-'}, {7, '-'}, {10, ' '}, {13, ':'},
+                                                                           {16, ':'}, {19, '.'}, {23, '.'} })
+    );
+    actual = ts.ToString("2000/01/02T03-04-05~123~456");
+    EXPECT_TRUE(CheckFormat(actual,
+                            std::vector<std::pair<int, char>>{ {4, '/'}, {7, '/'}, {10, 'T'}, {13, '-'}, {16, '-'},
+                                                                           {19, '~'}, {23, '~'} })
+    );
+}
+
+TEST(ToString, Format29) {
+    actual = ts.ToString("2000-01-02 03:04:05.123456789");
+    EXPECT_TRUE(CheckFormat(actual,
+                            std::vector<std::pair<int, char>>{ {4, '-'}, {7, '-'}, {10, ' '}, {13, ':'},
+                                                                           {16, ':'}, {19, '.'} })
+    );
+    actual = ts.ToString("2000/01/02T03-04-05~123456789");
+    EXPECT_TRUE(CheckFormat(actual,
+                            std::vector<std::pair<int, char>>{ {4, '/'}, {7, '/'}, {10, 'T'}, {13, '-'}, {16, '-'},
+                                                                           {19, '~'} })
+    );
+}
+
+TEST(ToString, Format30) {
+    actual = ts.ToString("2000-01-02 03:04:05.123.456789");
+    EXPECT_TRUE(CheckFormat(actual,
+                            std::vector<std::pair<int, char>>{ {4, '-'}, {7, '-'}, {10, ' '}, {13, ':'},
+                                                                           {16, ':'}, {19, '.'}, {23, '.'} })
+    );
+    actual = ts.ToString("2000/01/02T03-04-05~123~456789");
+    EXPECT_TRUE(CheckFormat(actual,
+                            std::vector<std::pair<int, char>>{ {4, '/'}, {7, '/'}, {10, 'T'}, {13, '-'}, {16, '-'},
+                                                                           {19, '~'}, {23, '~'} })
+    );
+}
+
+TEST(ToString, Format31) {
+    actual = ts.ToString("2000-01-02 03:04:05.123.456.789");
+    EXPECT_TRUE(CheckFormat(actual,
+                            std::vector<std::pair<int, char>>{ {4, '-'}, {7, '-'}, {10, ' '}, {13, ':'},
+                                                                           {16, ':'}, {19, '.'}, {23, '.'}, {27, '.'} })
+    );
+    actual = ts.ToString("2000/01/02T03-04-05~123~456~789");
+    EXPECT_TRUE(CheckFormat(actual,
+                            std::vector<std::pair<int, char>>{ {4, '/'}, {7, '/'}, {10, 'T'}, {13, '-'}, {16, '-'},
+                                                                           {19, '~'}, {23, '~'}, {27, '~'} })
+    );
 }
 
 TEST(ToString, TimeT14) {
@@ -360,6 +449,84 @@ TEST(ToTimeString, Format08) {
     strftime(expected, sizeof(expected), "%H-%M-%S", &t);
     actual = ts.ToTimeString("03-04-05");
     EXPECT_STREQ(expected, actual);
+}
+
+TEST(ToTimeString, Format12) {
+    auto time_point = std::chrono::system_clock::now();
+    actual = ts.ToTimeString("03:04:05.123", time_point);
+    EXPECT_TRUE(CheckFormat(actual,
+                            std::vector<std::pair<int, char>>{ {2, ':'}, {5, ':'}, {8, '.'} })
+    );
+
+    actual = ts.ToTimeString("03-04-05~123", time_point);
+    EXPECT_TRUE(CheckFormat(actual,
+                            std::vector<std::pair<int, char>>{ {2, '-'}, {5, '-'}, {8, '~'} })
+    );
+}
+
+TEST(ToTimeString, Format15) {
+    auto time_point = std::chrono::system_clock::now();
+    actual = ts.ToTimeString("03:04:05.123456", time_point);
+    EXPECT_TRUE(CheckFormat(actual,
+                            std::vector<std::pair<int, char>>{ {2, ':'}, {5, ':'}, {8, '.'} })
+    );
+
+    actual = ts.ToTimeString("03-04-05~123456", time_point);
+    EXPECT_TRUE(CheckFormat(actual,
+                            std::vector<std::pair<int, char>>{ {2, '-'}, {5, '-'}, {8, '~'} })
+    );
+}
+
+TEST(ToTimeString, Format16) {
+    auto time_point = std::chrono::system_clock::now();
+    actual = ts.ToTimeString("03:04:05.123.456", time_point);
+    EXPECT_TRUE(CheckFormat(actual,
+                            std::vector<std::pair<int, char>>{ {2, ':'}, {5, ':'}, {8, '.'}, {12, '.'} })
+    );
+
+    actual = ts.ToTimeString("03-04-05~123~456", time_point);
+    EXPECT_TRUE(CheckFormat(actual,
+                            std::vector<std::pair<int, char>>{ {2, '-'}, {5, '-'}, {8, '~'}, {12, '~'} })
+    );
+}
+
+TEST(ToTimeString, Format18) {
+    auto time_point = std::chrono::system_clock::now();
+    actual = ts.ToTimeString("03:04:05.123456789", time_point);
+    EXPECT_TRUE(CheckFormat(actual,
+                            std::vector<std::pair<int, char>>{ {2, ':'}, {5, ':'}, {8, '.'} })
+    );
+
+    actual = ts.ToTimeString("03-04-05~123456789", time_point);
+    EXPECT_TRUE(CheckFormat(actual,
+                            std::vector<std::pair<int, char>>{ {2, '-'}, {5, '-'}, {8, '~'} })
+    );
+}
+
+TEST(ToTimeString, Format19) {
+    auto time_point = std::chrono::system_clock::now();
+    actual = ts.ToTimeString("03:04:05.123.456789", time_point);
+    EXPECT_TRUE(CheckFormat(actual,
+                            std::vector<std::pair<int, char>>{ {2, ':'}, {5, ':'}, {8, '.'}, {12, '.'} })
+    );
+
+    actual = ts.ToTimeString("03-04-05~123~456789", time_point);
+    EXPECT_TRUE(CheckFormat(actual,
+                            std::vector<std::pair<int, char>>{ {2, '-'}, {5, '-'}, {8, '~'}, {12, '~'} })
+    );
+}
+
+TEST(ToTimeString, Format20) {
+    auto time_point = std::chrono::system_clock::now();
+    actual = ts.ToTimeString("03:04:05.123.456.789", time_point);
+    EXPECT_TRUE(CheckFormat(actual,
+                            std::vector<std::pair<int, char>>{ {2, ':'}, {5, ':'}, {8, '.'}, {12, '.'}, {16, '.'} })
+    );
+
+    actual = ts.ToTimeString("03-04-05~123~456~789", time_point);
+    EXPECT_TRUE(CheckFormat(actual,
+                            std::vector<std::pair<int, char>>{ {2, '-'}, {5, '-'}, {8, '~'}, {12, '~'}, {16, '~'} })
+    );
 }
 
 TEST(ToTimeString, TimeT06) {

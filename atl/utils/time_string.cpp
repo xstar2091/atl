@@ -282,7 +282,7 @@ const char* TimeString::ToString() {
 const char* TimeString::ToString(const char* fmt) {
     return ToStringHelper(fmt,
                           strlen(fmt),
-                          time(nullptr),
+                          std::chrono::system_clock::now(),
                           buf_,
                           sizeof(buf_));
 }
