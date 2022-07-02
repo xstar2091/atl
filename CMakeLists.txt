@@ -8,3 +8,4 @@ set(PROJECT_ROOT_DIR ${PROJECT_SOURCE_DIR})
 
 add_subdirectory(atl)
 add_subdirectory(test)
+add_subdirectory(examples)

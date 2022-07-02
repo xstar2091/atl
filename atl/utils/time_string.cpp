@@ -348,7 +348,7 @@ const char* TimeString::ToTimeString() {
 const char* TimeString::ToTimeString(const char *fmt) {
     return ToTimeStringHelper(fmt,
                               strlen(fmt),
-                              time(nullptr),
+                              std::chrono::system_clock::now(),
                               buf_,
                               sizeof(buf_));
 }

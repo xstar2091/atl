@@ -452,78 +452,72 @@ TEST(ToTimeString, Format08) {
 }
 
 TEST(ToTimeString, Format12) {
-    auto time_point = std::chrono::system_clock::now();
-    actual = ts.ToTimeString("03:04:05.123", time_point);
+    actual = ts.ToTimeString("03:04:05.123");
     EXPECT_TRUE(CheckFormat(actual,
                             std::vector<std::pair<int, char>>{ {2, ':'}, {5, ':'}, {8, '.'} })
     );
 
-    actual = ts.ToTimeString("03-04-05~123", time_point);
+    actual = ts.ToTimeString("03-04-05~123");
     EXPECT_TRUE(CheckFormat(actual,
                             std::vector<std::pair<int, char>>{ {2, '-'}, {5, '-'}, {8, '~'} })
     );
 }
 
 TEST(ToTimeString, Format15) {
-    auto time_point = std::chrono::system_clock::now();
-    actual = ts.ToTimeString("03:04:05.123456", time_point);
+    actual = ts.ToTimeString("03:04:05.123456");
     EXPECT_TRUE(CheckFormat(actual,
                             std::vector<std::pair<int, char>>{ {2, ':'}, {5, ':'}, {8, '.'} })
     );
 
-    actual = ts.ToTimeString("03-04-05~123456", time_point);
+    actual = ts.ToTimeString("03-04-05~123456");
     EXPECT_TRUE(CheckFormat(actual,
                             std::vector<std::pair<int, char>>{ {2, '-'}, {5, '-'}, {8, '~'} })
     );
 }
 
 TEST(ToTimeString, Format16) {
-    auto time_point = std::chrono::system_clock::now();
-    actual = ts.ToTimeString("03:04:05.123.456", time_point);
+    actual = ts.ToTimeString("03:04:05.123.456");
     EXPECT_TRUE(CheckFormat(actual,
                             std::vector<std::pair<int, char>>{ {2, ':'}, {5, ':'}, {8, '.'}, {12, '.'} })
     );
 
-    actual = ts.ToTimeString("03-04-05~123~456", time_point);
+    actual = ts.ToTimeString("03-04-05~123~456");
     EXPECT_TRUE(CheckFormat(actual,
                             std::vector<std::pair<int, char>>{ {2, '-'}, {5, '-'}, {8, '~'}, {12, '~'} })
     );
 }
 
 TEST(ToTimeString, Format18) {
-    auto time_point = std::chrono::system_clock::now();
-    actual = ts.ToTimeString("03:04:05.123456789", time_point);
+    actual = ts.ToTimeString("03:04:05.123456789");
     EXPECT_TRUE(CheckFormat(actual,
                             std::vector<std::pair<int, char>>{ {2, ':'}, {5, ':'}, {8, '.'} })
     );
 
-    actual = ts.ToTimeString("03-04-05~123456789", time_point);
+    actual = ts.ToTimeString("03-04-05~123456789");
     EXPECT_TRUE(CheckFormat(actual,
                             std::vector<std::pair<int, char>>{ {2, '-'}, {5, '-'}, {8, '~'} })
     );
 }
 
 TEST(ToTimeString, Format19) {
-    auto time_point = std::chrono::system_clock::now();
-    actual = ts.ToTimeString("03:04:05.123.456789", time_point);
+    actual = ts.ToTimeString("03:04:05.123.456789");
     EXPECT_TRUE(CheckFormat(actual,
                             std::vector<std::pair<int, char>>{ {2, ':'}, {5, ':'}, {8, '.'}, {12, '.'} })
     );
 
-    actual = ts.ToTimeString("03-04-05~123~456789", time_point);
+    actual = ts.ToTimeString("03-04-05~123~456789");
     EXPECT_TRUE(CheckFormat(actual,
                             std::vector<std::pair<int, char>>{ {2, '-'}, {5, '-'}, {8, '~'}, {12, '~'} })
     );
 }
 
 TEST(ToTimeString, Format20) {
-    auto time_point = std::chrono::system_clock::now();
-    actual = ts.ToTimeString("03:04:05.123.456.789", time_point);
+    actual = ts.ToTimeString("03:04:05.123.456.789");
     EXPECT_TRUE(CheckFormat(actual,
                             std::vector<std::pair<int, char>>{ {2, ':'}, {5, ':'}, {8, '.'}, {12, '.'}, {16, '.'} })
     );
 
-    actual = ts.ToTimeString("03-04-05~123~456~789", time_point);
+    actual = ts.ToTimeString("03-04-05~123~456~789");
     EXPECT_TRUE(CheckFormat(actual,
                             std::vector<std::pair<int, char>>{ {2, '-'}, {5, '-'}, {8, '~'}, {12, '~'}, {16, '~'} })
     );
