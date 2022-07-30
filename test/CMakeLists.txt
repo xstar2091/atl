@@ -1,6 +1,10 @@
-project(test)
+project(unittest)
 
-#include_directories(${PROJECT_ROOT_DIR})
-add_executable(time_string_test utils/time_string_test.cpp)
-target_include_directories(time_string_test PRIVATE ${PROJECT_ROOT_DIR})
-target_link_libraries(time_string_test atl gtest_main gtest)
+add_executable(${PROJECT_NAME}
+    utils/time_string_test.cpp
+    utils/thread_pool_async_group_test.cpp
+    utils/thread_pool_async_task_callable_test.cpp
+    utils/thread_pool_test.cpp
+)
+target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_ROOT_DIR})
+target_link_libraries(${PROJECT_NAME} atl gtest_main gtest pthread)
