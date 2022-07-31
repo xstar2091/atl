@@ -77,11 +77,11 @@ TEST(ThreadPool, PushWaitMulti) {
     int result3 = future3.get();
     int result4 = future4.get();
     int result5 = future5.get();
-    EXPECT_EQ(1, result1);
-    EXPECT_EQ(2, result2);
-    EXPECT_EQ(3, result3);
-    EXPECT_EQ(4, result4);
-    EXPECT_EQ(5, result5);
+    EXPECT_TRUE(1 <= result1 && result1 <= 5);
+    EXPECT_TRUE(1 <= result2 && result2 <= 5);
+    EXPECT_TRUE(1 <= result3 && result3 <= 5);
+    EXPECT_TRUE(1 <= result4 && result4 <= 5);
+    EXPECT_TRUE(1 <= result5 && result5 <= 5);
     pool.Stop();
     pool.Wait();
     EXPECT_EQ(6, num);

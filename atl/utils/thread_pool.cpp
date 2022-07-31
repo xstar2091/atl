@@ -1,6 +1,5 @@
 #include "atl/utils/thread_pool.h"
 
-
 namespace atl {
 
 AsyncGroup::~AsyncGroup() {}
@@ -93,10 +92,14 @@ void ThreadPool::WorkThread() {
         }
         while (next_) {
             AsyncTaskCallable task;
-            std::lock_guard<std::mutex> lock(mtx_);
-            if (!tasks_.empty()) {
-                task = std::move(tasks_.front());
-                tasks_.pop();
+            {
+                std::lock_guard<std::mutex> lock(mtx_);
+                if (!tasks_.empty()) {
+                    task = std::move(tasks_.front());
+                    tasks_.pop();
+                }
+            }
+            if (task.callable) {
                 task.callable->CallAsyncFunction();
                 task.callable->CallFinishCallback();
                 if (task.group == nullptr) {
