@@ -96,6 +96,7 @@ public:
     static AsyncGroup* CreateAsyncGroup(std::function<void()>&& group_finish_callback = nullptr);
 
 public:
+    ThreadPool();
     bool IsStopped() const { return !next_; }
     void Start(int pool_size = 0);
 
@@ -118,7 +119,18 @@ public:
                                          std::forward<CallbackType>(callback_function)));
         cv_.notify_one();
     }
-    void Push(atl::AsyncGroup* group);
+
+    template<class AsyncFunctionType, class CallbackType>
+    void Push(AsyncFunctionType&& async_function,
+              CallbackType&& callback_function,
+              AsyncGroup* group) {
+        std::lock_guard<std::mutex> lock(mtx_);
+        tasks_.emplace(AsyncTaskCallable(std::forward<AsyncFunctionType>(async_function),
+                                         std::forward<CallbackType>(callback_function)));
+        tasks_.back().group = group;
+        cv_.notify_one();
+    }
+    void Push(AsyncGroup* group);
     void Stop();
     void Wait();
 

@@ -1,10 +1,10 @@
 #include <gtest/gtest.h>
 
 #include <atomic>
-#include "atl/utils/thread_pool.h"
+#include "atl/utils/thread_pool2.h"
 
-TEST(ThreadPool, Start) {
-    atl::ThreadPool pool;
+TEST(ThreadPool2, Start) {
+    atl::ThreadPool2 pool;
     EXPECT_TRUE(pool.IsStopped());
 
     pool.Start();
@@ -17,10 +17,10 @@ TEST(ThreadPool, Start) {
     EXPECT_TRUE(pool.IsStopped());
 }
 
-TEST(ThreadPool, PushBackgroundWorker) {
+TEST(ThreadPool2, PushBackgroundWorker) {
     int num = 1;
     auto func = [&num]() { num++; };
-    atl::ThreadPool pool;
+    atl::ThreadPool2 pool;
     pool.Start();
 
     EXPECT_EQ(1, num);
@@ -31,10 +31,10 @@ TEST(ThreadPool, PushBackgroundWorker) {
     EXPECT_EQ(2, num);
 }
 
-TEST(ThreadPool, PushWaitInt) {
+TEST(ThreadPool2, PushWaitInt) {
     int num = 1;
     auto func = [&num]() -> int { num++; return num; };
-    atl::ThreadPool pool;
+    atl::ThreadPool2 pool;
     pool.Start();
 
     EXPECT_EQ(1, num);
@@ -46,10 +46,10 @@ TEST(ThreadPool, PushWaitInt) {
     EXPECT_EQ(2, num);
 }
 
-TEST(ThreadPool, PushWaitVoid) {
+TEST(ThreadPool2, PushWaitVoid) {
     int num = 1;
     auto func = [&num]() { num++; };
-    atl::ThreadPool pool;
+    atl::ThreadPool2 pool;
     pool.Start();
 
     EXPECT_EQ(1, num);
@@ -61,10 +61,10 @@ TEST(ThreadPool, PushWaitVoid) {
     EXPECT_EQ(2, num);
 }
 
-TEST(ThreadPool, PushWaitMulti) {
+TEST(ThreadPool2, PushWaitMulti) {
     std::atomic<int> num(1);
     auto func = [&num]() -> int { return num.fetch_add(1); };
-    atl::ThreadPool pool;
+    atl::ThreadPool2 pool;
     pool.Start();
 
     EXPECT_EQ(1, num);
@@ -131,9 +131,9 @@ private:
     std::atomic<int> count;
 };
 
-TEST(ThreadPool, PushWaitAsyncClass) {
+TEST(ThreadPool2, PushWaitAsyncClass) {
     PushWaitAsyncTestClass test_class;
-    atl::ThreadPool pool;
+    atl::ThreadPool2 pool;
     pool.Start();
     pool.Push(std::bind(&PushWaitAsyncTestClass::Test1, &test_class),
               std::bind(&PushWaitAsyncTestClass::Test1Callback, &test_class));
@@ -147,7 +147,7 @@ TEST(ThreadPool, PushWaitAsyncClass) {
     EXPECT_EQ(6, test_class.GetCount());
 }
 
-TEST(ThreadPool, PushWaitAsyncLambda) {
+TEST(ThreadPool2, PushWaitAsyncLambda) {
     int num0 = 0;
     int num1 = 1;
     int num2 = 2;
@@ -162,7 +162,7 @@ TEST(ThreadPool, PushWaitAsyncLambda) {
         count.fetch_add(1);
         EXPECT_EQ(expected, actual);
     };
-    atl::ThreadPool pool;
+    atl::ThreadPool2 pool;
     pool.Start();
     pool.Push(std::bind(func, std::ref(num0)), std::bind(callback, 1, std::ref(num0)));
     pool.Push(std::bind(func, std::ref(num1)), std::bind(callback, 2, std::ref(num1)));
@@ -175,7 +175,7 @@ TEST(ThreadPool, PushWaitAsyncLambda) {
     EXPECT_EQ(10, count.load());
 }
 
-TEST(ThreadPool, PushWaitGroup) {
+TEST(ThreadPool2, PushWaitGroup) {
     std::atomic<int> count(0);
     std::vector<int> nums;
     for (int i = 0; i < 5; i++) nums.emplace_back(i);
@@ -193,9 +193,9 @@ TEST(ThreadPool, PushWaitGroup) {
         EXPECT_EQ(10, count.load());
         count.fetch_add(1);
     };
-    atl::ThreadPool pool;
+    atl::ThreadPool2 pool;
     pool.Start();
-    atl::AsyncGroup* group = atl::ThreadPool::CreateAsyncGroup(group_callback);
+    atl::AsyncGroup* group = atl::ThreadPool2::CreateAsyncGroup(group_callback);
     group->Push(std::bind(func, 0), std::bind(callback, 0));
     group->Push(std::bind(func, 1), std::bind(callback, 1));
     group->Push(std::bind(func, 2), std::bind(callback, 2));

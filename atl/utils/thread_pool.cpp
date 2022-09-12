@@ -43,6 +43,9 @@ AsyncTaskCallable& AsyncTaskCallable::operator=(AsyncTaskCallable &&other) {
     return *this;
 }
 
+ThreadPool::ThreadPool()
+    : next_(false) {}
+
 AsyncGroup* ThreadPool::CreateAsyncGroup(std::function<void()>&& group_finish_callback) {
     return new AsyncGroupImpl(std::forward<std::function<void()>>(group_finish_callback));
 }
@@ -57,8 +60,8 @@ void ThreadPool::Start(int pool_size) {
     }
 }
 
-void ThreadPool::Push(atl::AsyncGroup* group) {
-    atl::AsyncGroupImpl* impl = static_cast<atl::AsyncGroupImpl*>(group);
+void ThreadPool::Push(AsyncGroup* group) {
+    AsyncGroupImpl* impl = static_cast<AsyncGroupImpl*>(group);
     std::lock_guard<std::mutex> lock(mtx_);
     for (auto& pair : impl->task_list) {
         tasks_.emplace(AsyncTaskCallable(std::move(pair.first), std::move(pair.second)));
