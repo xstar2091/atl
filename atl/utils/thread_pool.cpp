@@ -5,7 +5,8 @@ namespace atl {
 AsyncGroup::~AsyncGroup() {}
 
 AsyncGroupImpl::AsyncGroupImpl(std::function<void()>&& group_finish_callback)
-    : AsyncGroup() {
+    : AsyncGroup()
+    , finish_count(1) {
     if (group_finish_callback) {
         this->group_finish_callback = std::forward<std::function<void()>>(group_finish_callback);
     }
@@ -13,15 +14,21 @@ AsyncGroupImpl::AsyncGroupImpl(std::function<void()>&& group_finish_callback)
 
 AsyncGroupImpl::~AsyncGroupImpl() {}
 
+
+void AsyncGroupImpl::Push(std::function<void()>&& async_task_function)
+{
+    this->task_list.emplace_back(std::make_pair(std::forward<std::function<void()>>(async_task_function), [](){}));
+}
+
 void AsyncGroupImpl::Push(std::function<void()>&& async_task_function, std::function<void()>&& finish_callback) {
     this->task_list.emplace_back(std::make_pair(std::forward<std::function<void()>>(async_task_function),
                                                 std::forward<std::function<void()>>(finish_callback)));
 }
 
-bool AsyncGroupImpl::IsAllFinished() const {
-    int finished_count = this->finish_count.load();
+bool AsyncGroupImpl::IsAllFinished() {
     int total_count = static_cast<int>(this->task_list.size());
-    return finished_count == total_count;
+    int finished_count = this->finish_count.fetch_add(1);
+    return total_count == finished_count;
 }
 
 AsyncTaskCallable::CallableBase::~CallableBase() {}
@@ -109,7 +116,6 @@ void ThreadPool::WorkThread() {
                     continue;
                 }
                 AsyncGroupImpl* impl = static_cast<AsyncGroupImpl*>(task.group);
-                impl->FinishOne();
                 if (impl->IsAllFinished()) {
                     if (impl->group_finish_callback) {
                         impl->group_finish_callback();

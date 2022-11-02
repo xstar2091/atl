@@ -15,6 +15,7 @@ namespace atl {
 class AsyncGroup {
 public:
     virtual ~AsyncGroup();
+    virtual void Push(std::function<void()>&& async_task_function) = 0;
     virtual void Push(std::function<void()>&& async_task_function, std::function<void()>&& finish_callback) = 0;
 };
 
@@ -22,11 +23,11 @@ class AsyncGroupImpl : public AsyncGroup {
 public:
     AsyncGroupImpl(std::function<void()>&& group_finish_callback);
     virtual ~AsyncGroupImpl();
+    void Push(std::function<void()>&& async_task_function) override;
     void Push(std::function<void()>&& async_task_function, std::function<void()>&& finish_callback) override;
 
 public:
-    void FinishOne() { finish_count.fetch_add(1); }
-    bool IsAllFinished() const;
+    bool IsAllFinished();
 
 public:
     std::atomic<int> finish_count;

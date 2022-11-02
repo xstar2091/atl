@@ -207,3 +207,51 @@ TEST(ThreadPool, PushWaitGroup) {
     pool.Wait();
     EXPECT_EQ(11, count.load());
 }
+
+// 所有任务完成后，停止线程池，只设置异步任务
+TEST(ThreadPool, StopInGrop) {
+    std::atomic<int> count(0);
+    auto func = [&count]() {
+        count.fetch_add(1);
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    };
+    int async_task_run_count = 1000;
+    atl::ThreadPool pool;
+    pool.Start();
+    auto group_callback = [&pool]() {
+        pool.Stop();
+    };
+
+    atl::AsyncGroup* group = atl::ThreadPool::CreateAsyncGroup(group_callback);
+    for (int i = 0; i < async_task_run_count; i++) {
+        group->Push(std::bind(func));
+    }
+    pool.Push(group);
+
+    pool.Wait();
+    EXPECT_EQ(count.load(), async_task_run_count);
+}
+
+// 所有任务完成后，停止线程池，设置异步任务和任务完成回调
+TEST(ThreadPool, StopInGrop2) {
+    std::atomic<int> count(0);
+    auto func = [&count]() {
+        count.fetch_add(1);
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    };
+    int async_task_run_count = 1000;
+    atl::ThreadPool pool;
+    pool.Start();
+    auto group_callback = [&pool]() {
+        pool.Stop();
+    };
+
+    atl::AsyncGroup* group = atl::ThreadPool::CreateAsyncGroup(group_callback);
+    for (int i = 0; i < async_task_run_count; i++) {
+        group->Push(std::bind(func), [](){});
+    }
+    pool.Push(group);
+
+    pool.Wait();
+    EXPECT_EQ(count.load(), async_task_run_count);
+}

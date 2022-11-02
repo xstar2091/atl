@@ -20,28 +20,6 @@ TEST(AsyncGroup, Push) {
     delete group;
 }
 
-TEST(AsyncGroupImpl, FinishOne) {
-    atl::AsyncGroup* group = atl::ThreadPool::CreateAsyncGroup();
-    atl::AsyncGroupImpl* impl = static_cast<atl::AsyncGroupImpl*>(group);
-
-    group->Push(nullptr, nullptr);
-    group->Push(nullptr, nullptr);
-    group->Push(nullptr, nullptr);
-
-    EXPECT_EQ(0, impl->finish_count.load());
-    impl->FinishOne();
-    EXPECT_EQ(1, impl->finish_count.load());
-    impl->FinishOne();
-    EXPECT_EQ(2, impl->finish_count.load());
-    impl->FinishOne();
-    EXPECT_EQ(3, impl->finish_count.load());
-    impl->FinishOne();
-    EXPECT_EQ(4, impl->finish_count.load());
-    impl->FinishOne();
-    EXPECT_EQ(5, impl->finish_count.load());
-    delete group;
-}
-
 TEST(AsyncGroupImpl, IsAllFinished) {
     atl::AsyncGroup* group = atl::ThreadPool::CreateAsyncGroup();
     atl::AsyncGroupImpl* impl = static_cast<atl::AsyncGroupImpl*>(group);
@@ -51,15 +29,10 @@ TEST(AsyncGroupImpl, IsAllFinished) {
     group->Push(nullptr, nullptr);
 
     EXPECT_FALSE(impl->IsAllFinished());
-    impl->FinishOne();
     EXPECT_FALSE(impl->IsAllFinished());
-    impl->FinishOne();
-    EXPECT_FALSE(impl->IsAllFinished());
-    impl->FinishOne();
     EXPECT_TRUE(impl->IsAllFinished());
-    impl->FinishOne();
     EXPECT_FALSE(impl->IsAllFinished());
-    impl->FinishOne();
+    EXPECT_FALSE(impl->IsAllFinished());
     EXPECT_FALSE(impl->IsAllFinished());
     delete group;
 }
